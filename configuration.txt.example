@@ -1,1 +1,6 @@
-
+[PostGIS]
+HOST=
+USER=
+PASSWORD=
+DATABASE=
+PORT=

@@ -36,7 +36,7 @@ import flask
 
 import pywps
 from pywps.app.Service import Service
-import logging
+
 
 # from flask_cors import CORS
 
