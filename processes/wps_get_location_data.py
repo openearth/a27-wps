@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-# Copyright notice
+#  Copyright notice
 #   --------------------------------------------------------------------
-#   Copyright (C) 2022 Deltares
-#       Ioanna Micha
-#       ioanna.micha@deltares.nl
+#   Copyright (C) 2025 Deltares for Project A27.
+#   Main contributors: 
+#   Ioanna Micha (ioanna.micha@deltares.nl)
+#   Gerrit Hendriksen (Gerrit Hendriksen@deltares.nl)
 #
 #   This library is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -24,6 +25,7 @@
 # programming tools in an open source, version controlled environment.
 # Sign up to recieve regular updates of this function, and to contribute
 # your own tools.
+
 
 
 from pywps.app import Process, Format
