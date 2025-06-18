@@ -1,0 +1,12 @@
+name: a27-wps
+channels:
+  - conda-forge
+dependencies:
+  - flask=3
+  - pandas=2
+  - pip=25
+  - python=3
+  - sqlalchemy=2
+  - psycopg2-binary
+  - pywps=4
+

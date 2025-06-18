@@ -31,9 +31,7 @@
 # your own tools.
 
 import os
-
 import flask
-
 import pywps
 from pywps.app.Service import Service
 
