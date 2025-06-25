@@ -26,13 +26,14 @@
 # your own tools.
 
 import configparser
+import time
+import datetime
 from pathlib import Path
 from sqlalchemy import select, func
 from sqlalchemy import create_engine
 service_path = Path(__file__).resolve().parents[1]
 import logging
 logger = logging.getLogger("PYWPS")
-
 
 def read_config(file_name="configuration.txt"):
     """Reads the configuration file
@@ -67,6 +68,35 @@ def get_locations():
     """
     engine = create_connection_db()
     with engine.connect() as connection:
-        query = select(func.gws.get_locations_geojson())
+        #query = select(func.gws.get_locations_geojson())
+        query = select(func.gws.get_locations_pfid_geojson())  # this yields list of locatie_id and peilfilter_id
         result = connection.execute(query).fetchone()[0]
+        logger.info('result of the function',result)
     return result
+
+
+def get_data(peilfilterid,start_date,end_date):
+    """Retrieves the data for specific peilfilter id
+    Inputs:
+        peilfilterid: Integer
+        start_date  : startdate (text will be formatted to timestamp)
+        end_date  : enddate (text will be formatted to timestamp)
+    Returns:
+        json with datetime and stages
+    """
+    
+    logger.info('startdate type', type(start_date))
+    engine = create_connection_db()
+    with engine.connect() as connection:
+        #query = select(func.gws.get_locations_geojson())
+        query = select(func.gws.get_peilfilter_data_json(peilfilterid,start_date,end_date))  # this yields list of locatie_id and peilfilter_id
+        result = connection.execute(query).fetchone()[0]
+        logger.info('result of the function',result)
+    return result
+
+
+def test_get_data():
+    peilfilterid = 436
+    start_date = '2013-06-01 00:00:00'
+    end_date = '2013-12-31 23:59:59'
+    print(get_data(peilfilterid,start_date,end_date))
