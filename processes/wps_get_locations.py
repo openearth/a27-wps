@@ -39,6 +39,7 @@ import json
 # Process to retrieve A27 locations from the database
 
 #http://localhost:5000/wps?service=WPS&request=Execute&version=1.0.0&identifier=wps_get_locations
+#https://a27.openearth.nl/wps?service=wps&request=Execute&version=1.0.0&identifier=wps_get_locations
 class WpsGetLocations(Process):
     def __init__(self):
         inputs = []
