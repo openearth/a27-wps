@@ -28,6 +28,7 @@
 import configparser
 import time
 import datetime
+import json
 from pathlib import Path
 from sqlalchemy import select, func
 from sqlalchemy import create_engine
@@ -79,7 +80,7 @@ def get_locations():
         query = select(func.gws.get_locations_pfid_geojson())  # this yields list of locatie_id and peilfilter_id
         result = connection.execute(query).fetchone()[0]
         logger.info('result of the function',result)
-    return result
+    return json.dumps(result)
 
 
 def get_data(peilfilterid,start_date,end_date):
@@ -107,7 +108,7 @@ def get_data(peilfilterid,start_date,end_date):
             result = 'no data found for specified period' 
         finally:
             logger.info('result of the function',result)
-    return result
+    return json.dumps(result)
 
 
 def test_get_data():
