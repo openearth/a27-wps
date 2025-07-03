@@ -32,6 +32,7 @@
 # http://localhost:5000/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":436, "start_date":"","end_date":"2013-12-31 23:59:59"}
 # http://localhost:5000/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":436, "start_date":"2013-06-01 00:00:00","end_date":""}
 # https://a27.openearth.nl/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":436, "start_date":"2013-06-01 00:00:00","end_date":"2013-12-31 23:59:59"}
+# https://a27.openearth.nl/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":530, "start_date":"","end_date":""}
 
 import json
 from pywps import Format
@@ -57,8 +58,8 @@ class WpsGetPeilfilterData(Process):
             self._handler,
             identifier="wps_get_peilfilter_data",
             version="1.0.0",
-            title="Retrieve timeseries data for selected peilfilter wihtin specifiek period",
-            abstract="Retrieve timeseries data for selected peilfilter wihtin specifiek period.",
+            title="Retrieve timeseries data for selected peilfilter for any date range (start_date and/or end_date can be empty strings)",
+            abstract="Retrieve timeseries data for selected peilfilter for any date range (start_date and/or end_date can be empty strings). ",
             profile="",
             metadata=[
                 Metadata("WpsGetPeilfilterData"),
