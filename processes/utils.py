@@ -58,7 +58,14 @@ def create_connection_db():
     host = cf.get("PostGIS", "HOST")
     port = cf.get("PostGIS", "PORT")
     database = cf.get("PostGIS", "DATABASE")
-    engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
+    try:
+        engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
+        result = 'connection to database setup succesful'
+    except Exception as e:
+        engine = None
+        result = 'connection not succesful due to '+e
+    finally:
+        logger.info('connection message', result)
     return engine
 
 def get_locations():
@@ -79,24 +86,44 @@ def get_data(peilfilterid,start_date,end_date):
     """Retrieves the data for specific peilfilter id
     Inputs:
         peilfilterid: Integer
-        start_date  : startdate (text will be formatted to timestamp)
-        end_date  : enddate (text will be formatted to timestamp)
+        start_date  : startdate (text will be formatted to timestamp), can be empty string
+        end_date  : enddate (text will be formatted to timestamp), can be empty string
     Returns:
         json with datetime and stages
     """
-    
-    logger.info('startdate type', type(start_date))
+    if start_date == '':
+        start_date = None
+    if end_date == '':
+        end_date = None
+
+    logger.info('startdate: ', start_date)
     engine = create_connection_db()
     with engine.connect() as connection:
         #query = select(func.gws.get_locations_geojson())
         query = select(func.gws.get_peilfilter_data_json(peilfilterid,start_date,end_date))  # this yields list of locatie_id and peilfilter_id
-        result = connection.execute(query).fetchone()[0]
-        logger.info('result of the function',result)
+        try:
+            result = connection.execute(query).fetchone()[0]
+        except Exception:
+            result = 'no data found for specified period' 
+        finally:
+            logger.info('result of the function',result)
     return result
 
 
 def test_get_data():
-    peilfilterid = 436
-    start_date = '2013-06-01 00:00:00'
-    end_date = '2013-12-31 23:59:59'
-    print(get_data(peilfilterid,start_date,end_date))
+    dcttest={}
+    dcttest["t1"] = [530,None,None]
+    dcttest["t2"] = [530,'2016-09-12T08:00:00','2016-12-12T08:00:00']
+    dcttest["t3"] = [530,'2016-09-12T08:00:00',None]
+    dcttest["t4"] = [530,None,'2016-12-12T08:00:00']
+
+    for t in dcttest.keys():
+        peilfilterid = dcttest[t][0]
+        start_date = dcttest[t][1]
+        end_date = dcttest[t][2]
+        try:
+            result = get_data(peilfilterid,start_date,end_date)
+        except Exception:
+            result = 'no data found'
+        finally:
+            print(t,result)

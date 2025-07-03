@@ -38,7 +38,9 @@ FROM gws.peilfilter_data pfd
 join gws.peilfilter pf on pf.peilfilter_id = pfd.peilfilter_id
 join gws.locatie l on l.locatie_id = pf.locatie_id
 join gws.meting m on m.peilfilter_id = pfd.peilfilter_id
-where pfd.peilfilter_id = peilfilterid and m.datumtijd between start_time and end_time
+where pfd.peilfilter_id = peilfilterid 
+and m.datumtijd >= coalesce(start_time,m.datumtijd - interval '100 year') 
+and (end_time is NULL or m.datumtijd <= end_time)
 group by pf.locatie_id,
 		 l.locatienaam_master,
 		 l.maaiveldhoogte_cm_nap, 
