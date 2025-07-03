@@ -16,12 +16,14 @@ SELECT json_build_object(
         json_build_object(
             'type', 'Feature',
             'geometry', ST_AsGeoJSON(ST_SetSRID(ST_MakePoint(longitude_wgs84, latitude_wgs84), 4326))::json,
-            'properties', ARRAY(SELECT json_build_object('locatie_id', l.locatie_id,
-			                                             'peilfilter_ids',l.peilfilterids)
-        ))
+            'properties', json_build_object(
+                'locatie_id', l.locatie_id,
+                'peilfilter_ids', l.peilfilterids
+            )
+        )
     )
-)
-FROM gws.locatie_agg l
+) AS feature_collection
+FROM gws.locatie_agg l;
 $BODY$;
 
 '# deprecated function because it is required to get a list of filters for each tube'
