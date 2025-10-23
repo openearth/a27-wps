@@ -18,7 +18,9 @@ SELECT json_build_object(
             'geometry', ST_AsGeoJSON(ST_SetSRID(ST_MakePoint(longitude_wgs84, latitude_wgs84), 4326))::json,
             'properties', json_build_object(
                 'locatie_id', l.locatie_id,
-                'peilfilter_ids', l.peilfilterids
+                'peilfilter_ids', l.peilfilterids,
+                'bron_id', l.bron_id,
+                'dataleverancier', l.dataleverancier
             )
         )
     )
