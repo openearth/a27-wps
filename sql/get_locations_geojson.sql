@@ -20,7 +20,8 @@ SELECT json_build_object(
                 'locatie_id', l.locatie_id,
                 'peilfilter_ids', l.peilfilterids,
                 'bron_id', l.bron_id,
-                'dataleverancier', l.dataleverancier
+                'dataleverancier', l.dataleverancier,
+                'locatienaam_master', l.locatienaam_master
             )
         )
     )
