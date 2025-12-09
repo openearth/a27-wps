@@ -44,12 +44,14 @@ from processes.wps_ultimate_question import UltimateQuestion
 # A27 processes
 from processes.wps_get_locations import WpsGetLocations
 from processes.wps_get_peilfilter_data import WpsGetPeilfilterData
+from processes.wps_get_precipitation_data import WpsGetPrecipitationData
 
 # TODO add the proces in the processes list
 processes = [
     UltimateQuestion(),
     WpsGetLocations(),
     WpsGetPeilfilterData(),
+    WpsGetPrecipitationData(),
 ]
 
 # Description used in template
