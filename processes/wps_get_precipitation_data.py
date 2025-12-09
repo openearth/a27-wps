@@ -27,12 +27,7 @@
 # your own tools.
 
 # test and production requests
-# http://localhost:5000/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":436, "start_date":"","end_date":""}
-# http://localhost:5000/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":436, "start_date":"2013-06-01 00:00:00","end_date":"2013-12-31 23:59:59"}
-# http://localhost:5000/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":436, "start_date":"","end_date":"2013-12-31 23:59:59"}
-# http://localhost:5000/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":436, "start_date":"2013-06-01 00:00:00","end_date":""}
-# https://a27.openearth.nl/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":436, "start_date":"2013-06-01 00:00:00","end_date":"2013-12-31 23:59:59"}
-# https://a27.openearth.nl/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_peilfilter_data&datainputs=peilfilterinfo={"peilfilterid":530, "start_date":"","end_date":""}
+#http://localhost:5000/wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_precipitation_data&datainputs=locationinfo={%22x%22:5.207047,%22y%22:52.066449,%20%22start_date%22:%22%22,%22end_date%22:%22%22}
 
 import json
 from pywps import Format
@@ -82,11 +77,11 @@ class WpsGetPrecipitationData(Process):
             y = locationinfo_json['y']
             start_date = locationinfo_json['start_date']
             end_date = locationinfo_json['end_date']
-            logger.info('provided input', x, y, start_date, end_date)
+        
 
             response.outputs["precipitation_data"].data = get_precipitation_data(x, y, start_date, end_date)
         except Exception as e:
-            res = { 'errMsg' : 'ERROR: {}'.format(e)}
-            logger.info(res)     
-            response.outputs["precipitation_data"].data = "Something went very wrong, please check logfile"
+                res = { 'errMsg' : 'ERROR: {}'.format(e)}
+                logger.info(res)     
+                response.outputs["precipitation_data"].data = "Something went very wrong, please check logfile"
         return response

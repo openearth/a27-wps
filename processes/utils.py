@@ -132,8 +132,14 @@ def test_get_data():
             result = 'no data found'
         finally:
             print(t,result)
+#documentation: 
+#https://nlmod.readthedocs.io/en/stable/_modules/nlmod/read/knmi.html#_download_knmi_at_locations
+#https://hydropandas.readthedocs.io/en/stable/examples/02_knmi_observations.html
 
+#x = 5.086331275 → longitude (east–west)
+#y = 52.128939522 → latitude (north–south)
 def get_precipitation_data(x, y, start_date, end_date):
+    
     """Retrieves the precipitation data for specific coordinates
     Inputs:
         x: x coordinate in RD New (EPSG:28992) format
@@ -144,34 +150,37 @@ def get_precipitation_data(x, y, start_date, end_date):
         json with datetime and precipitation in format [{datetime: , value:}, ...]
     """
     if start_date == '':
-        start_date = None
+        start_date = '2010-01-01'
     if end_date == '':
         end_date = None
     
-    try:
-        # Convert coordinates to tuple
-        xy = (float(x), float(y))
-        
-        # Get daily precipitation from nearest KNMI station (RH → m/day)
-        prec = hpd.PrecipitationObs.from_knmi(
-            xy=xy,
-            start=start_date,
-            end=end_date,
-        )
-        
-        # Get as pandas Series and convert to mm/day
-        s = prec.to_series()  # index = date, values = m/day
+   
+    xy = (float(x), float(y))
+    
+    # Get daily precipitation from nearest KNMI station (RH → m/day)
+    prec = hpd.PrecipitationObs.from_knmi(
+        xy=xy,
+        start=start_date,
+        end=end_date,
+    )
+    print(type(prec))
+    
+    # PrecipitationObs is a DataFrame, so access the data column directly
+    # The column is typically named 'RH' for precipitation data
+    # Check available columns: print(prec.columns)
+    if len(prec.columns) > 0:
+      
+        s = prec.iloc[:, 0]  
         prec_mm = s * 1000.0  # convert to mm/day
-        
-        # Convert to JSON format [{datetime: , value:}, ...]
-        result = []
-        for date, value in prec_mm.items():
-            result.append({
-                "datetime": date.strftime("%Y-%m-%dT%H:%M:%S"),
-                "value": float(value) if not pd.isna(value) else None
-            })
-        
-        return json.dumps(result)
-    except Exception as e:
-        logger.error(f"Error getting precipitation data: {e}")
-        return json.dumps({"error": str(e)})
+    else:
+        prec_mm = pd.Series(dtype=float)  # empty series if no data
+    
+    # Convert to JSON format [{datetime: , value:}, ...]
+    result = []
+    for date, value in prec_mm.items():
+        result.append({
+            "datetime": date.strftime("%Y-%m-%dT%H:%M:%S"),
+            "value": float(value) if not pd.isna(value) else None
+        })
+    timeseries = {"timeseries": result}
+    return json.dumps(timeseries)
