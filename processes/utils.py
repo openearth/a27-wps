@@ -29,9 +29,13 @@ import configparser
 import time
 import datetime
 import json
+import pandas as pd
+import pyproj
 from pathlib import Path
 from sqlalchemy import select, func
 from sqlalchemy import create_engine
+
+import hydropandas as hpd
 service_path = Path(__file__).resolve().parents[1]
 import logging
 logger = logging.getLogger("PYWPS")
@@ -128,3 +132,46 @@ def test_get_data():
             result = 'no data found'
         finally:
             print(t,result)
+
+def get_precipitation_data(x, y, start_date, end_date):
+    """Retrieves the precipitation data for specific coordinates
+    Inputs:
+        x: x coordinate in RD New (EPSG:28992) format
+        y: y coordinate in RD New (EPSG:28992) format
+        start_date: startdate (text will be formatted to timestamp), can be empty string
+        end_date: enddate (text will be formatted to timestamp), can be empty string
+    Returns:
+        json with datetime and precipitation in format [{datetime: , value:}, ...]
+    """
+    if start_date == '':
+        start_date = None
+    if end_date == '':
+        end_date = None
+    
+    try:
+        # Convert coordinates to tuple
+        xy = (float(x), float(y))
+        
+        # Get daily precipitation from nearest KNMI station (RH → m/day)
+        prec = hpd.PrecipitationObs.from_knmi(
+            xy=xy,
+            start=start_date,
+            end=end_date,
+        )
+        
+        # Get as pandas Series and convert to mm/day
+        s = prec.to_series()  # index = date, values = m/day
+        prec_mm = s * 1000.0  # convert to mm/day
+        
+        # Convert to JSON format [{datetime: , value:}, ...]
+        result = []
+        for date, value in prec_mm.items():
+            result.append({
+                "datetime": date.strftime("%Y-%m-%dT%H:%M:%S"),
+                "value": float(value) if not pd.isna(value) else None
+            })
+        
+        return json.dumps(result)
+    except Exception as e:
+        logger.error(f"Error getting precipitation data: {e}")
+        return json.dumps({"error": str(e)})
