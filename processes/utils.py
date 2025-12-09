@@ -142,8 +142,8 @@ def get_precipitation_data(x, y, start_date, end_date):
     
     """Retrieves the precipitation data for specific coordinates
     Inputs:
-        x: x coordinate in RD New (EPSG:28992) format
-        y: y coordinate in RD New (EPSG:28992) format
+        x: x coordinate (longitude) in EPSG:4326 (WGS84) format
+        y: y coordinate (latitude) in EPSG:4326 (WGS84) format
         start_date: startdate (text will be formatted to timestamp), can be empty string
         end_date: enddate (text will be formatted to timestamp), can be empty string
     Returns:
@@ -154,8 +154,10 @@ def get_precipitation_data(x, y, start_date, end_date):
     if end_date == '':
         end_date = None
     
-   
-    xy = (float(x), float(y))
+    # Transform coordinates from EPSG:4326 (WGS84) to EPSG:28992 (RD New)
+    transformer = pyproj.Transformer.from_crs("EPSG:4326", "EPSG:28992", always_xy=True)
+    x_rd, y_rd = transformer.transform(float(x), float(y))
+    xy = (x_rd, y_rd)
     
     # Get daily precipitation from nearest KNMI station (RH → m/day)
     prec = hpd.PrecipitationObs.from_knmi(
