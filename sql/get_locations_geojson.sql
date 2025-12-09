@@ -21,12 +21,25 @@ SELECT json_build_object(
                 'peilfilter_ids', l.peilfilterids,
                 'bron_id', l.bron_id,
                 'dataleverancier', l.dataleverancier,
-                'locatienaam_master', l.locatienaam_master
+                'locatienaam_master', l.locatienaam_master,
+                'focus', CASE
+                    WHEN ST_Within(
+                        ST_Transform(ST_SetSRID(ST_MakePoint(l.longitude_wgs84, l.latitude_wgs84), 4326), ST_SRID(bbox.geom)),
+                        bbox.geom
+                    ) THEN true
+                    ELSE false
+                END
             )
         )
     )
 ) AS feature_collection
-FROM gws.locatie_agg l;
+FROM gws.locatie_agg l
+CROSS JOIN LATERAL (
+    SELECT geom
+    FROM public.bounding_box_intressegebied
+    LIMIT 1
+) bbox;
+   
 $BODY$;
 
 '# deprecated function because it is required to get a list of filters for each tube'
