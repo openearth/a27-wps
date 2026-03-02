@@ -5,7 +5,6 @@
 #   --------------------------------------------------------------------
 #   Copyright (C) 2022 Deltares
 #     Ioanna Micha
-
 #     ioanna.micha@deltares.nl
 #
 #
@@ -45,6 +44,7 @@ from processes.wps_ultimate_question import UltimateQuestion
 from processes.wps_get_locations import WpsGetLocations
 from processes.wps_get_peilfilter_data import WpsGetPeilfilterData
 from processes.wps_get_precipitation_data import WpsGetPrecipitationData
+from processes.wps_get_depth_info import WpsGetDepthInfo
 
 # TODO add the proces in the processes list
 processes = [
@@ -52,6 +52,7 @@ processes = [
     WpsGetLocations(),
     WpsGetPeilfilterData(),
     WpsGetPrecipitationData(),
+    WpsGetDepthInfo(),
 ]
 
 # Description used in template

@@ -70,7 +70,7 @@ def create_connection_db():
         engine = None
         result = 'connection not succesful due to '+e
     finally:
-        logger.info('connection message', result)
+        logger.info('connection message %s', result)
     return engine
 
 def get_locations():
@@ -83,7 +83,7 @@ def get_locations():
         #query = select(func.gws.get_locations_geojson())
         query = select(func.gws.get_locations_pfid_geojson())  # this yields list of locatie_id and peilfilter_id
         result = connection.execute(query).fetchone()[0]
-        logger.info('result of the function',result)
+        logger.info('result of the function %s', result)
     return json.dumps(result)
 
 
@@ -101,7 +101,7 @@ def get_data(peilfilterid,start_date,end_date):
     if end_date == '':
         end_date = None
 
-    logger.info('startdate: ', start_date)
+    logger.info('startdate: %s', start_date)
     engine = create_connection_db()
     with engine.connect() as connection:
         #query = select(func.gws.get_locations_geojson())
@@ -111,8 +111,29 @@ def get_data(peilfilterid,start_date,end_date):
         except Exception:
             result = 'no data found for specified period' 
         finally:
-            logger.info('result of the function',result)
+            logger.info('result of the function %s', result)
     return json.dumps(result)
+
+
+def get_depth_info(peilfilter_ids):
+    """Retrieves depth info for the given peilfilter IDs.
+    Inputs:
+        peilfilter_ids: list of integers (peilfilter_id)
+    Returns:
+        json with peilbuis_top, peilbuis_bottom and filters (filter_top, filter_bottom per peilfilter_id)
+    """
+    if not peilfilter_ids:
+        return json.dumps({})
+    engine = create_connection_db()
+    with engine.connect() as connection:
+        query = select(func.gws.get_depth_info_json(peilfilter_ids))
+        try:
+            result = connection.execute(query).fetchone()[0]
+        except Exception:
+            result = {}
+        finally:
+            logger.info("result of get_depth_info_json %s", result)
+    return json.dumps(result) if result is not None else json.dumps({})
 
 
 def test_get_data():
@@ -132,6 +153,7 @@ def test_get_data():
             result = 'no data found'
         finally:
             print(t,result)
+            
 #documentation: 
 #https://nlmod.readthedocs.io/en/stable/_modules/nlmod/read/knmi.html#_download_knmi_at_locations
 #https://hydropandas.readthedocs.io/en/stable/examples/02_knmi_observations.html
@@ -186,3 +208,25 @@ def get_precipitation_data(x, y, start_date, end_date):
         })
     timeseries = {"timeseries": result}
     return json.dumps(timeseries)
+
+
+def get_depth_info(peilfilter_ids):
+    """Retrieves the depth info for specific peilfilter ids
+    Inputs:
+        peilfilter_ids: list of peilfilter ids
+    Returns:
+        json with depth info. 
+        
+        
+        Depth info will be 
+            * peilbuis_cm_from_nap_top.
+            * bovenkant_filter_cm_nap.
+            * onderkant_filter_cm_nap.
+            * peilbuis_cm_from_nap_bottom (derived from the length of the peilbuis).
+        
+    """
+    engine = create_connection_db()
+    with engine.connect() as connection:
+        query = select(func.gws.get_depth_info_json(peilfilter_ids))
+        result = connection.execute(query).fetchone()[0]
+    return json.dumps(result)

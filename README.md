@@ -34,6 +34,21 @@ Returns timeseries data for a selected peilfilter. Date range is optional; use e
 
 ---
 
+### `wps_get_depth_info`
+
+**Retrieve depth info for selected peilfilters**
+
+Returns depth info (peilbuis top/bottom and filter top/bottom per peilfilter) for the given peilfilter IDs. Values are in m NAP (two decimal places).
+
+- **Inputs:**  
+  - `peilfilter_ids` (application/json):  
+    `{"peilfilter_ids": [<int>, <int>, ...]}`  
+- **Output:** `depth_info` (application/json), e.g. `{"peilbuis_top": <m>, "peilbuis_bottom": <m>, "filters": [{"peilfilter_id": <int>, "filter_top": <m>, "filter_bottom": <m>}, ...]}`  
+- **Example:**  
+  `GET .../wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_depth_info&datainputs=peilfilter_ids={"peilfilter_ids":[2000,2001]}`
+
+---
+
 ### `wps_get_precipitation_data`
 
 **Retrieve precipitation timeseries for a location**
