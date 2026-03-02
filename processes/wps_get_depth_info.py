@@ -80,10 +80,8 @@ class WpsGetDepthInfo(Process):
     def _handler(self, request, response):
         try:
             peilfilter_ids_data = request.inputs["peilfilter_ids"][0].data
-            peilfilter_ids_json = json.loads(peilfilter_ids_data)
-            peilfilter_ids = peilfilter_ids_json.get("peilfilter_ids")
-            logger.info("provided input peilfilter_ids=%s", peilfilter_ids)
-
+            peilfilter_ids = json.loads(peilfilter_ids_data)
+            
             response.outputs["depth_info"].data = get_depth_info(peilfilter_ids)
         except Exception as e:
             res = {"errMsg": "ERROR: {}".format(e)}
