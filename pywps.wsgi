@@ -44,6 +44,7 @@ from processes.wps_ultimate_question import UltimateQuestion
 from processes.wps_get_locations import WpsGetLocations
 from processes.wps_get_peilfilter_data import WpsGetPeilfilterData
 from processes.wps_get_precipitation_data import WpsGetPrecipitationData
+from processes.wps_get_timeseries_data import WpsGetTimeseriesData
 from processes.wps_get_depth_info import WpsGetDepthInfo
 
 # TODO add the proces in the processes list
@@ -52,6 +53,7 @@ processes = [
     WpsGetLocations(),
     WpsGetPeilfilterData(),
     WpsGetPrecipitationData(),
+    WpsGetTimeseriesData(),
     WpsGetDepthInfo(),
 ]
 

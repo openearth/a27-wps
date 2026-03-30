@@ -64,6 +64,24 @@ Returns daily precipitation (mm/day) from the nearest KNMI station for the given
 
 ---
 
+### `wps_get_precipitation_groundwater_data`
+
+**Retrieve precipitation + groundwater timeseries (matched start/end)**
+
+Calls `wps_get_peilfilter_data` first to determine the groundwater min/max dates, then uses those dates to retrieve daily precipitation from the nearest KNMI station for the provided coordinates.
+
+- **Inputs:**  
+  - `peilfilterinfo` (application/json):  
+    `{"peilfilterid": <int>, "start_date": "<datetime or \"\">", "end_date": "<datetime or \"\">"}`
+  - `locationinfo` (application/json):  
+    `{"x": <lon>, "y": <lat>}`
+- **Output:** `precipitation_groundwater_data` (application/json), e.g.
+  `{"precipitation": {"timeseries": [{"datetime": "...", "value": ...}, ...]}, "groundwater": {"timeseries": [{"datetime": "...", "value": ...}, ...]}}`
+- **Example:**  
+  `GET .../wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_precipitation_groundwater_data&datainputs=peilfilterinfo={"peilfilterid":436,"start_date":"","end_date":""},locationinfo={"x":5.207047,"y":52.066449}`
+
+---
+
 ### `ultimate_question`
 
 **Answer to the ultimate question**
