@@ -9,4 +9,6 @@ dependencies:
   - sqlalchemy=2
   - psycopg2-binary
   - pywps=4
+  - pip:
+    - hydropandas
 

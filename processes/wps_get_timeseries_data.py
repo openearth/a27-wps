@@ -24,6 +24,9 @@
 # OpenEarthTools is an online collaboration to share and manage data and
 # programming tools in an open source, version controlled environment.
 
+# call the WPSlocalhost:5000/wps?service=WPS&request=Execute&version=1.0.0&identifier=wps_get_timeseries_data&datainputs=pointinfo={"id": "1447", "x": 5.132707 , "y": 52.074099}
+# 
+
 import json
 import logging
 from datetime import datetime
@@ -98,77 +101,44 @@ class WpsGetTimeseriesData(Process):
     def _handler(self, request, response):
         #try:
         # Inputs
-        point_info = request.inputs["point_info"][0].data
+        point_info = request.inputs["pointinfo"][0].data
         point_info_json = json.loads(point_info)
-
-       
-        peilfilter_id = point_info_json["peilfilterid"]
-       
-
+        peilfilter_id = point_info_json["id"]
         x = point_info_json["x"]
         y = point_info_json["y"]
         print("x", x)
         print("y", y)
         print("peilfilter_id", peilfilter_id)
+
         # 1) Groundwater first (so we can derive time bounds)
         gw_raw = get_data(peilfilter_id, start_date= '', end_date= '')
-        print("gw_raw", gw_raw)
+        # print("gw_raw", type(gw_raw))
         gw_json = json.loads(gw_raw)
-        print("gw_json", gw_json)
+        #print("gw_json", gw_json)
       
-
-        # gw_ts = gw_json.get("timeseries", []) or []
-
-        # gw_dt_list = []
-        # for item in gw_ts:
-        #     dt = _parse_gw_datetime(item.get("datetime"))
-        #     if dt is not None:
-        #         gw_dt_list.append(dt)
-
-        # if not gw_dt_list:
-        #     raise ValueError("No groundwater timeseries returned for the provided period.")
-
-        # gw_start_dt = min(gw_dt_list)
-        # gw_end_dt = max(gw_dt_list)
-        # gw_start_date = gw_start_dt.date()
-        # gw_end_date = gw_end_dt.date()
+        gw_ts = gw_json.get("timeseries", [])
+        gw_dates = [_parse_gw_datetime(item["datetime"]).date() for item in gw_ts if item.get("datetime")]
+        gw_start_dt = min(gw_dates)
+        gw_end_dt = max(gw_dates)
 
         # # 2) KNMI precipitation second (matched to groundwater dates)
-        # knmi_start = gw_start_date.isoformat()  # YYYY-MM-DD
-        # knmi_end = gw_end_date.isoformat()  # YYYY-MM-DD
+        knmi_start = gw_start_dt.isoformat()  # YYYY-MM-DD
+        knmi_end = gw_end_dt.isoformat()  # YYYY-MM-DD
 
-        # prec_raw = get_precipitation_data(x, y, knmi_start, knmi_end)
-        # prec_json = json.loads(prec_raw)
-        # prec_ts = prec_json.get("timeseries", []) or []
+        prec_raw = get_precipitation_data(x, y, knmi_start, knmi_end)
+        prec_json = json.loads(prec_raw)
+        knmi_ts = prec_json.get("timeseries", [])
+        knmi_dates = [_parse_gw_datetime(item["datetime"]).date() for item in knmi_ts if item.get("datetime")]
+        knmi_start_dt = min(knmi_dates)
+        knmi_end_dt = max(knmi_dates)
+        print("start_dt", knmi_start_dt, gw_start_dt)
+        print("end_dt", knmi_end_dt, gw_end_dt)
 
-        # # Clip both series to keep the "start/end match" behavior.
-        # prec_ts_clipped = []
-        # for item in prec_ts:
-        #     dt = datetime.fromisoformat(item["datetime"])
-        #     if gw_start_date <= dt.date() <= gw_end_date:
-        #         prec_ts_clipped.append(
-        #             {
-        #                 "datetime": item["datetime"],
-        #                 "value": item.get("value"),
-        #             }
-        #         )
-
-        # gw_ts_clipped = []
-        # for item in gw_ts:
-        #     dt = _parse_gw_datetime(item.get("datetime"))
-        #     if dt is not None and gw_start_dt <= dt <= gw_end_dt:
-        #         gw_ts_clipped.append(
-        #             {
-        #                 "datetime": item["datetime"],
-        #                 "value": item.get("head"),
-        #             }
-        #         )
-
-        # result = {
-        #     "precipitation": {"timeseries": prec_ts_clipped},
-        #     "groundwater": {"timeseries": gw_ts_clipped},
-        # }
-        result = {"test": "test"}
+        result = {
+            "precipitation": {"timeseries": knmi_ts},
+            "groundwater": {"timeseries": gw_ts},
+        }
+        # result = {"test": "test"}
         response.outputs["timeseries_data"].data = json.dumps(result)
         #except Exception as e:
         #    res = {"errMsg": "ERROR: {}".format(e)}

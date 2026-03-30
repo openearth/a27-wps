@@ -187,7 +187,7 @@ def get_precipitation_data(x, y, start_date, end_date):
         start=start_date,
         end=end_date,
     )
-    print(type(prec))
+    # print(type(prec))
     
     # PrecipitationObs is a DataFrame, so access the data column directly
     # The column is typically named 'RH' for precipitation data
