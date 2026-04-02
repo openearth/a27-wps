@@ -160,7 +160,7 @@ def test_get_data():
 
 #x = 5.086331275 → longitude (east–west)
 #y = 52.128939522 → latitude (north–south)
-def get_precipitation_data(x, y, start_date, end_date):
+def get_precipitation_data(x, y, start_date, end_date, show_until_date=None):
     
     """Retrieves the precipitation data for specific coordinates
     Inputs:
@@ -168,6 +168,10 @@ def get_precipitation_data(x, y, start_date, end_date):
         y: y coordinate (latitude) in EPSG:4326 (WGS84) format
         start_date: startdate (text will be formatted to timestamp), can be empty string
         end_date: enddate (text will be formatted to timestamp), can be empty string
+        show_until_date:  add a boolean `show` key per item:
+            `show=True` while the item's date is <= `show_until_date` (inclusive),
+            otherwise `show=False`.
+            If None, `show` is set to True for all items.
     Returns:
         json with datetime and precipitation in format [{datetime: , value:}, ...]
     """
@@ -187,11 +191,9 @@ def get_precipitation_data(x, y, start_date, end_date):
         start=start_date,
         end=end_date,
     )
-    # print(type(prec))
     
     # PrecipitationObs is a DataFrame, so access the data column directly
     # The column is typically named 'RH' for precipitation data
-    # Check available columns: print(prec.columns)
     if len(prec.columns) > 0:
       
         s = prec.iloc[:, 0]  
@@ -201,10 +203,17 @@ def get_precipitation_data(x, y, start_date, end_date):
     
     # Convert to JSON format [{datetime: , value:}, ...]
     result = []
+    show_until = show_until_date
+    
     for date, value in prec_mm.items():
+        dt_date = date.date()
+        show = True
+        if show_until is not None:
+            show = dt_date <= show_until
         result.append({
             "datetime": date.strftime("%Y-%m-%dT%H:%M:%S"),
-            "value": float(value) if not pd.isna(value) else None
+            "value": float(value) if not pd.isna(value) else None,
+            "show": show,
         })
     timeseries = {"timeseries": result}
     return json.dumps(timeseries)
