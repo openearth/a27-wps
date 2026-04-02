@@ -13,12 +13,13 @@ AS $BODY$
     LIMIT 1
   ),
   filters AS (
-    SELECT
+    SELECT DISTINCT ON (peilfilter_id)
       peilfilter_id,
       ROUND(bovenkant_filter_cm_nap / 100.0, 2) AS filter_top,
       ROUND(onderkant_filter_cm_nap / 100.0, 2) AS filter_bottom
     FROM gws.peilfilter_data
     WHERE peilfilter_id = ANY(peilfilter_ids)
+    ORDER BY peilfilter_id, COALESCE(upper(period), 'infinity'::timestamp) DESC
   )
   SELECT json_build_object(
     'peilbuis_top', (SELECT peilbuis_top FROM peilbuis),
