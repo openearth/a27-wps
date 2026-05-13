@@ -46,8 +46,9 @@ from processes.wps_get_peilfilter_data import WpsGetPeilfilterData
 from processes.wps_get_precipitation_data import WpsGetPrecipitationData
 from processes.wps_get_timeseries_data import WpsGetTimeseriesData
 from processes.wps_get_depth_info import WpsGetDepthInfo
+from processes.wps_get_bomen_locations import WpsGetBomenLocations
+from processes.wps_get_boom_data import WpsGetBoomData
 
-# TODO add the proces in the processes list
 processes = [
     UltimateQuestion(),
     WpsGetLocations(),
@@ -55,6 +56,8 @@ processes = [
     WpsGetPrecipitationData(),
     WpsGetTimeseriesData(),
     WpsGetDepthInfo(),
+    WpsGetBomenLocations(),
+    WpsGetBoomData(),
 ]
 
 # Description used in template

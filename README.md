@@ -82,6 +82,71 @@ Calls `wps_get_peilfilter_data` first to determine the groundwater min/max dates
 
 ---
 
+### `wps_get_bomen_locations`
+
+**Retrieve monitored tree locations**
+
+Returns all 33 monitored trees as a GeoJSON FeatureCollection. Intended to be called
+once at FE startup to populate the tree map layer.
+
+- **Inputs:** none  
+- **Output:** `bomen_locations` (application/json) — GeoJSON FeatureCollection where each
+  feature has properties: `boom_id`, `boomcode`, `boomnaam`, `soort_group`,
+  `exclude_from_group_stats`  
+- **Example:**  
+  `GET .../wps?service=WPS&request=Execute&version=1.0.0&identifier=wps_get_bomen_locations`
+
+---
+
+### `wps_get_boom_data`
+
+**Retrieve tree health graph data**
+
+Returns graph data for one clicked tree (or multiple selected trees in the future).
+The database function shapes the response directly: selected tree, y-axis metadata,
+the relevant group average line(s), and the requested tree timeseries.
+
+- **Inputs:**  
+  - `boominfo` (application/json):  
+    `{"boomnaams": ["<boomcode or boomnaam>", …]}`  
+- **Output:** `boom_data` (application/json), e.g.:
+  ```json
+  {
+    "selected_tree": "1FS",
+    "y_axis": {
+      "min": 0,
+      "max": 8,
+      "labels": ["Dood", "Bijna dood", "Slecht", "Matig-slecht", "Matig",
+                 "Voldoende-matig", "Voldoende", "Voldoende-goed", "Goed"]
+    },
+    "group_averages": [
+      {
+        "group": "Beuken",
+        "visible_by_default": true,
+        "timeseries": [
+          { "date": "2018-06-01T00:00:00", "health_value": 6.8 }
+        ]
+      }
+    ],
+    "trees": [
+      {
+        "tree": "1FS",
+        "tree_name": "1FS",
+        "group_that_belongs": "Beuken",
+        "visible_by_default": true,
+        "timeseries": [
+          { "date": "2018-06-01T00:00:00", "health_value": 7, "health_label": "Voldoende-goed" }
+        ]
+      }
+    ]
+  }
+  ```
+- **Examples:**  
+  `GET .../wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_boom_data&datainputs=boominfo={"boomnaams":["1FS"]}`  
+  `GET .../wps?service=wps&request=Execute&version=2.0.0&Identifier=wps_get_boom_data&datainputs=boominfo={"boomnaams":["1FS","9FS","3Qu"]}`
+
+---
+
 ### `ultimate_question`
 
 **Answer to the ultimate question**

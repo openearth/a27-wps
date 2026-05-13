@@ -239,3 +239,42 @@ def get_depth_info(peilfilter_ids):
         query = select(func.gws.get_depth_info_json(peilfilter_ids))
         result = connection.execute(query).fetchone()[0]
     return json.dumps(result)
+
+
+# ---------------------------------------------------------------------------
+# Boom (tree) functions
+# ---------------------------------------------------------------------------
+
+def get_bomen() -> str:
+    """Returns all monitored trees as a GeoJSON FeatureCollection.
+    
+    Returns:
+        JSON string (GeoJSON FeatureCollection)
+    """
+    engine = create_connection_db()
+    with engine.connect() as connection:
+        query  = select(func.gws.get_bomen_geojson())
+        result = connection.execute(query).fetchone()[0]
+        logger.info("get_bomen: result %s", result)
+    return json.dumps(result)
+
+
+def get_boom_data(boomnaams: list) -> str:
+    """Returns the tree-health graph payload from the database.
+
+    The SQL function shapes the response directly, including selected tree,
+    y-axis metadata, relevant group averages and requested tree timeseries.
+
+    Inputs:
+        boomnaams: list of boomcode or boomnaam strings
+    Returns:
+        JSON string returned by gws.get_boom_data_json
+    """
+    engine = create_connection_db()
+
+    with engine.connect() as connection:
+        query  = select(func.gws.get_boom_data_json(boomnaams))
+        raw    = connection.execute(query).fetchone()[0]
+        logger.info("get_boom_data: result %s", raw)
+
+    return json.dumps(raw or {})
