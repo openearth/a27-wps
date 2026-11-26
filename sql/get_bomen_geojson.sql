@@ -22,7 +22,8 @@ SELECT json_build_object(
                     'boomcode',                 b.boomcode,
                     'boomnaam',                 b.boomnaam,
                     'soort_group',              b.soort_group,
-                    'exclude_from_group_stats', b.exclude_from_group_stats
+                    'exclude_from_group_stats', b.exclude_from_group_stats,
+                    'soilmoisture',             b.soilmoisture
                 )
             )
         ),
